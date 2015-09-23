@@ -1,6 +1,11 @@
 #!/bin/bash
 
 
+db_name="dev"
+db_user="root"
+db_pass="dev"
+
+
 printf "#### Provisioning Vagrant Box..."
 
 printf "#### Updating Vagrant Box..."
@@ -17,3 +22,14 @@ export DEBIAN_FRONTEND=noninteractive
 printf "#### Installing Necessary Packages..."
 # install required packages
 apt-get install -qq git
+
+
+printf "#### Installing MySQL..."
+# install MySQL
+apt-get install -qq mysql-server
+
+# update root password
+mysqladmin -u root password ${db_pass}
+
+# create dev database
+mysql -uroot -p${db_pass} -e "create database ${db_name};"
