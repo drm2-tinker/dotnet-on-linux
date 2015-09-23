@@ -45,7 +45,7 @@ echo "deb http://download.mono-project.com/repo/debian wheezy main" | tee /etc/a
 # update the system
 apt-get update -qq > /dev/null
 
-# install complete Mono Packages
+# install complete Mono Packages and Mono Server
 apt-get install -qq mono-complete mono-fastcgi-server4 > /dev/null
 
 
@@ -65,7 +65,7 @@ server {
         access_log  /vagrant/dev.access.log;
 
         location / {
-            root  /vagrant;
+            root  /vagrant/www;
             index index.html index.htm default.aspx Default.aspx;
 
             fastcgi_index Default.aspx;
@@ -88,7 +88,7 @@ sed -i "s/user www-data;/user vagrant;/g" /etc/nginx/nginx.conf
 usermod -a -G www-data vagrant
 
 # start the Mono server
-fastcgi-mono-server4 /applications=/:/vagrant/www/ /socket=tcp:127.0.0.1:9999
+fastcgi-mono-server4 /applications=/:/vagrant/www /socket=tcp:127.0.0.1:9000
 
 # start nginx
 service nginx restart
