@@ -43,10 +43,10 @@ apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 3FA7E0328081BF
 echo "deb http://download.mono-project.com/repo/debian wheezy main" | tee /etc/apt/sources.list.d/mono-xamarin.list
 
 # update the system
-apt-get update > /dev/null
+apt-get update -qq > /dev/null
 
 # install complete Mono Packages
-apt-get install mono-complete
+apt-get install -qq mono-complete mono-fastcgi-server4 > /dev/null
 
 
 printf "#### Installing Nginx..."
@@ -88,7 +88,7 @@ sed -i "s/user www-data;/user vagrant;/g" /etc/nginx/nginx.conf
 usermod -a -G www-data vagrant
 
 # start the Mono server
-fastcgi-mono-server4 /applications=/:/:/vagrant/www/ /socket=tcp:127.0.0.1:9999
+fastcgi-mono-server4 /applications=/:/vagrant/www/ /socket=tcp:127.0.0.1:9999
 
 # start nginx
 service nginx restart
