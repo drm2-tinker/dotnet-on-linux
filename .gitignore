@@ -1,0 +1,7 @@
+# Directories to Ignore
+/.vagrant
+
+# Files to Ignore
+.DS_Store
+.env
+!.gitkeep
