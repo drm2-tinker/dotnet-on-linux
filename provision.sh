@@ -35,6 +35,20 @@ mysqladmin -u root password ${db_pass}
 mysql -uroot -p${db_pass} -e "create database ${db_name};"
 
 
+printf "#### Installing Mono..."
+# add GPG signing key
+apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF
+
+# add Mono repository
+echo "deb http://download.mono-project.com/repo/debian wheezy main" | tee /etc/apt/sources.list.d/mono-xamarin.list
+
+# update the system
+apt-get update > /dev/null
+
+# install complete mono Packages
+apt-get install mono-complete
+
+
 printf "#### Installing Nginx..."
 # install nginx
 apt-get install -qq nginx > /dev/null
