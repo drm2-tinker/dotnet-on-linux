@@ -23,5 +23,6 @@ Vagrant.configure(VAGRANT_API_VERSION) do |config|
     end
 
     # call provisioning shell scripts
+    config.vm.provision :shell, path: "./enable-swap.sh", run: "always"
     config.vm.provision :shell, path: "./provision.sh"
 end
