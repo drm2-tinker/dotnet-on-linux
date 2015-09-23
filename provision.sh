@@ -65,7 +65,7 @@ server {
         access_log  /vagrant/dev.access.log;
 
         location / {
-            root  /var/www/www.domain1.xyz/;
+            root  /vagrant;
             index index.html index.htm default.aspx Default.aspx;
 
             fastcgi_index Default.aspx;
