@@ -12,3 +12,8 @@ apt-get update -qq > /dev/null
 
 # suppress prompts
 export DEBIAN_FRONTEND=noninteractive
+
+
+printf "#### Installing Necessary Packages..."
+# install required packages
+apt-get install -qq git
