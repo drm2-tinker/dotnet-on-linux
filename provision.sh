@@ -87,8 +87,68 @@ sed -i "s/user www-data;/user vagrant;/g" /etc/nginx/nginx.conf
 # add vagrant user to nginx group
 usermod -a -G www-data vagrant
 
-# start the Mono server as the vagrant user in a detached screen session
-sudo -u vagrant /bin/bash -c 'screen -S mono-server -d -m bash -c "fastcgi-mono-server4 --applications=/:/vagrant/www --socket=tcp:127.0.0.1:9000 --logfile=/vagrant/server.log --printlog=true"'
+# add init script for Mono Server
+tee /etc/init.d/monoserve << 'EOF'
+#!/bin/bash
+
+
+### BEGIN INIT INFO
+# Provides:          monoserve.sh
+# Required-Start:    $local_fs $syslog $remote_fs
+# Required-Stop:     $local_fs $syslog $remote_fs
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Start FastCGI Mono Server
+### END INIT INFO
+
+mono_server=$(which fastcgi-mono-server4)
+mono_server_pid=$(ps auxf | grep fastcgi-mono-server4.exe | grep -v grep | awk '{print $2}')
+
+applications="/:/vagrant/www"
+
+case "$1" in
+    start)
+        if [ -z "${mono_server_pid}" ]; then
+            echo "Starting Mono Server now..."
+            ${mono_server} --applications=${applications} --socket=tcp:127.0.0.1:9000 --logfile=/vagrant/server.log &
+        else
+            echo ${applications}
+            echo "Mono Server is already running."
+        fi
+    ;;
+    stop)
+        if [ -n "${mono_server_pid}" ]; then
+            echo "Stopping Mono Server now..."
+            kill ${mono_server_pid}
+        else
+            echo "Mono Server not running."
+        fi
+    ;;
+    restart)
+        if [ -n "${mono_server_pid}" ]; then
+            kill ${mono_server_pid}
+            echo "Restarting Mono Server now..."
+        else
+            echo "Mono Server not running. Starting now..."
+        fi
+
+        if [ -z "${mono_server_pid}" ]; then
+            ${mono_server} --applications=${applications} --socket=tcp:127.0.0.1:9000 --logfile=/vagrant/server.log &
+        fi
+    ;;
+esac
+
+exit 0
+EOF
+
+# make script executable
+chmod +x /etc/init.d/monoserve
+
+# install the script
+update-rc.d monoserve defaults
+
+# restart the Mono Server
+/etc/init.d/monoserve restart
 
 # start nginx
 service nginx restart
