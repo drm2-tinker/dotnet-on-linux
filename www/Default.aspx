@@ -1,10 +1,1 @@
-<%@ Page Language="C#" %>
-<!DOCTYPE html>
-<html>
-<head>
-    <title>ASP.NET on Linux Demo</title>
-</head>
-<body>
-    <h1>Hello, World!</h1>
-</body>
-</html>
+<%@ Page Trace="true"  Language="C#" ContentType="text/html" ResponseEncoding="utf-8" %>
