@@ -21,15 +21,57 @@ export DEBIAN_FRONTEND=noninteractive
 
 printf "#### Installing Necessary Packages..."
 # install required packages
-apt-get install -qq git
+apt-get install -qq git > /dev/null
 
 
 printf "#### Installing MySQL..."
 # install MySQL
-apt-get install -qq mysql-server
+apt-get install -qq mysql-server > /dev/null
 
 # update root password
 mysqladmin -u root password ${db_pass}
 
 # create dev database
 mysql -uroot -p${db_pass} -e "create database ${db_name};"
+
+
+printf "#### Installing Nginx..."
+# install nginx
+apt-get install -qq nginx > /dev/null
+
+# configure nginx
+cp /etc/nginx/sites-available/default /etc/nginx/sites-available/default.backup
+
+tee /etc/nginx/sites-available/default << 'EOF'
+server {
+        listen 80 default_server;
+        listen [::]:80 default_server;
+
+        server_name _;
+        access_log  /vagrant/dev.access.log;
+
+        location / {
+            root  /var/www/www.domain1.xyz/;
+            index index.html index.htm default.aspx Default.aspx;
+
+            fastcgi_index Default.aspx;
+            fastcgi_pass  127.0.0.1:9000;
+
+            include /etc/nginx/fastcgi_params;
+
+            fastcgi_param PATH_INFO       "";
+            fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        }
+
+        sendfile off;
+}
+EOF
+
+# make nginx run as vagrant user
+sed -i "s/user www-data;/user vagrant;/g" /etc/nginx/nginx.conf
+
+# add vagrant user to nginx group
+usermod -a -G www-data vagrant
+
+# start nginx
+service nginx restart
