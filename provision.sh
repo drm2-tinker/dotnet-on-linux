@@ -87,8 +87,8 @@ sed -i "s/user www-data;/user vagrant;/g" /etc/nginx/nginx.conf
 # add vagrant user to nginx group
 usermod -a -G www-data vagrant
 
-# start the Mono server
-fastcgi-mono-server4 /applications=/:/vagrant/www /socket=tcp:127.0.0.1:9000
+# start the Mono server as the vagrant user in a detached screen session
+sudo -u vagrant /bin/bash -c 'screen -S mono-server -d -m bash -c "fastcgi-mono-server4 --applications=/:/vagrant/www --socket=tcp:127.0.0.1:9000 --logfile=/vagrant/server.log --printlog=true"'
 
 # start nginx
 service nginx restart
